@@ -422,6 +422,18 @@ function initServeEvent(server) {
       );
     });
   });
+  // 增加 token 验证中间件
+  if (store.get('token')) {
+    server.use((socket, next) => {
+      const token = socket.handshake.auth.token || socket.handshake.query.token // 获取 token
+      if (token === store.get('token')) {
+        // 校验 token
+        return next() // 验证通过
+      } else {
+        return next(new Error('Authentication error')) // 验证失败
+      }
+    });
+  }
 }
 
 /**
